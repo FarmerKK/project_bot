@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Form Automation Dashboard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">🤖</div>
+        <div class="brand-text">
+          <h1>FormBot Pro</h1>
+          <span>Google Form Automation</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a class="nav-item active" data-tab="tab-controller">
+          <span class="icon">⚡</span>
+          <span>แผงควบคุมบอท</span>
+        </a>
+        <a class="nav-item" data-tab="tab-scanner">
+          <span class="icon">🔍</span>
+          <span>สแกนแบบฟอร์ม</span>
+        </a>
+        <a class="nav-item" data-tab="tab-rules">
+          <span class="icon">⚙</span>
+          <span>ตั้งค่าเงื่อนไข</span>
+        </a>
+        <a class="nav-item" data-tab="tab-data">
+          <span class="icon">📊</span>
+          <span>ข้อมูลและพรีวิว</span>
+        </a>
+        <a class="nav-item" id="btn-open-timestamp-modal">
+          <span class="icon">⏰</span>
+          <span>ปลอมวันเวลา</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="status-badge">
+          <div class="status-dot"></div>
+          <span id="bot-status-text">พร้อมทำงาน</span>
+        </div>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">v1.2.0</span>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Tab 1: Live Controller -->
+      <section id="tab-controller" class="tab-pane active">
+        <div class="page-header">
+          <div>
+            <h2>แผงควบคุมและสั่งส่งคำตอบ</h2>
+            <p>ควบคุมการส่งข้อมูลไปยัง Google Form แบบเรียลไทม์</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-primary" id="btn-quick-generate">🎲 สุ่มข้อมูลใหม่</button>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-icon cyan">📊</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total">0</div>
+              <div class="stat-label">จำนวนคำตอบทั้งหมด</div>
+            </div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-icon emerald">✔</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-success" style="color: var(--accent-emerald);">0</div>
+              <div class="stat-label">ส่งสำเร็จ</div>
+            </div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-icon rose">✖</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-failed" style="color: var(--accent-rose);">0</div>
+              <div class="stat-label">ล้มเหลว</div>
+            </div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-icon purple">⚡</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-percent">0%</div>
+              <div class="stat-label">ความคืบหน้า</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Run Controls Card -->
+        <div class="glass-card">
+          <div class="card-title">🎮 ตัวเลือกการสั่งรันบอท</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; align-items: end;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">โหมดการส่ง (Submission Mode)</label>
+              <select class="select-custom" id="control-mode">
+                <option value="direct">⚡ Direct HTTP POST (เร็วมาก เสี้ยววินาที)</option>
+                <option value="browser">🌐 Browser Playwright (เปิดเบราว์เซอร์จริง)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">ความหน่วงเวลาระหว่างชุด (Delay): <span id="delay-val" style="color: var(--accent-cyan);">0.5s</span></label>
+              <input type="range" min="0.1" max="5.0" step="0.1" value="0.5" id="control-delay" style="width: 100%; accent-color: var(--accent-cyan);">
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-emerald" id="btn-start" style="flex: 1;">▶ เริ่มส่งคำตอบ</button>
+              <button class="btn btn-rose" id="btn-stop" style="flex: 1;" disabled>⏹ หยุดชั่วคราว</button>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container">
+            <div class="progress-header">
+              <span>ความคืบหน้าการส่ง</span>
+              <span id="progress-text">0 / 0</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Terminal -->
+        <div class="glass-card" style="padding: 0; overflow: hidden;">
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <div class="terminal-dot red"></div>
+                <div class="terminal-dot yellow"></div>
+                <div class="terminal-dot green"></div>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">LIVE SUBMISSION LOGS</span>
+              <button id="btn-clear-logs" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.75rem;">ล้างข้อความ</button>
+            </div>
+            <div class="terminal-body" id="terminal-logs">
+              <div class="log-entry log-info"><span class="log-time">[Ready]</span> ระบบเตรียมพร้อม เริ่มต้นส่งคำตอบได้ทันที</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: Form Scanner -->
+      <section id="tab-scanner" class="tab-pane" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h2>สแกนและวิเคราะห์ Google Form</h2>
+            <p>วางลิงก์ Google Form เพื่อให้บอทตรวจจับคำถามและรหัสตัวแปรโดยอัตโนมัติ</p>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">🔗 วางลิงก์ Google Form</div>
+          <div style="display: flex; gap: 12px;">
+            <input type="text" class="input-text" id="scan-url" placeholder="https://forms.gle/... หรือ https://docs.google.com/forms/d/e/.../viewform">
+            <button class="btn btn-primary" id="btn-scan" style="white-space: nowrap;">🔍 สแกนฟอร์ม</button>
+          </div>
+        </div>
+
+        <div id="scan-result-card" class="glass-card" style="display: none;">
+          <div class="card-title">📋 ผลการวิเคราะห์ฟอร์ม</div>
+          <div style="margin-bottom: 1.5rem; line-height: 1.6;">
+            <div><strong>หัวข้อฟอร์ม:</strong> <span id="form-info-title" style="color: var(--accent-cyan);">-</span></div>
+            <div><strong>รายละเอียด:</strong> <span id="form-info-desc" style="color: var(--text-secondary);">-</span></div>
+            <div><strong>จำนวนหน้า/ส่วน:</strong> <span id="form-info-pages">-</span> ส่วน</div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>รหัสตัวแปร (Entry ID)</th>
+                  <th>ประเภทคำถาม</th>
+                  <th>จำเป็น</th>
+                  <th>คำถาม</th>
+                  <th>ตัวเลือก</th>
+                </tr>
+              </thead>
+              <tbody id="scan-questions-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Rule Customizer -->
+      <section id="tab-rules" class="tab-pane" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h2>ตั้งค่าเงื่อนไขและสัดส่วนคะแนน (Rule & Percentage Customizer)</h2>
+            <p>กำหนดตัวเลือกที่อนุญาตและสัดส่วนเปอร์เซ็นต์ (%) ความน่าจะเป็นในการสุ่มแต่ละคำตอบ</p>
+          </div>
+          <button class="btn btn-emerald" id="btn-save-rules">💾 บันทึกการตั้งค่าทั้งหมด</button>
+        </div>
+
+        <!-- Quick Bulk Preset Card for Ratings -->
+        <div class="glass-card" style="border: 1px solid rgba(0, 242, 254, 0.3); background: rgba(17, 24, 39, 0.85);">
+          <div class="card-title" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.3rem;">⚡</span>
+              <span>ปรับสัดส่วน % คะแนนความพึงพอใจทั้งหมดในคลิกเดียว (Bulk Preset)</span>
+            </div>
+            <span class="badge" id="preset-total-badge" style="font-size: 0.85rem; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);">รวม: 100%</span>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.25rem;">
+            กำหนดสัดส่วนเปอร์เซ็นต์สำหรับคะแนนระดับ 1-5 แล้วคลิกนำไปใช้กับข้อคำถามในตารางประเมินทั้งหมดพร้อมกันได้ทันที:
+          </p>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+            <div class="preset-box">
+              <label class="form-label" style="color: #67e8f9; font-weight: 600;">คะแนน 5 (มากที่สุด)</label>
+              <div class="weight-input-wrapper">
+                <input type="number" class="input-text preset-weight" id="preset-5" value="50" min="0" max="100">
+                <span class="weight-unit">%</span>
+              </div>
+            </div>
+            <div class="preset-box">
+              <label class="form-label" style="color: #a7f3d0; font-weight: 600;">คะแนน 4 (มาก)</label>
+              <div class="weight-input-wrapper">
+                <input type="number" class="input-text preset-weight" id="preset-4" value="35" min="0" max="100">
+                <span class="weight-unit">%</span>
+              </div>
+            </div>
+            <div class="preset-box">
+              <label class="form-label" style="color: #fde68a; font-weight: 600;">คะแนน 3 (ปานกลาง)</label>
+              <div class="weight-input-wrapper">
+                <input type="number" class="input-text preset-weight" id="preset-3" value="15" min="0" max="100">
+                <span class="weight-unit">%</span>
+              </div>
+            </div>
+            <div class="preset-box">
+              <label class="form-label" style="color: #fed7aa; font-weight: 600;">คะแนน 2 (น้อย)</label>
+              <div class="weight-input-wrapper">
+                <input type="number" class="input-text preset-weight" id="preset-2" value="0" min="0" max="100">
+                <span class="weight-unit">%</span>
+              </div>
+            </div>
+            <div class="preset-box">
+              <label class="form-label" style="color: #fecdd3; font-weight: 600;">คะแนน 1 (น้อยที่สุด)</label>
+              <div class="weight-input-wrapper">
+                <input type="number" class="input-text preset-weight" id="preset-1" value="0" min="0" max="100">
+                <span class="weight-unit">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-secondary" id="btn-normalize-preset">⚡ ปรับให้รวมเป็น 100%</button>
+            <button class="btn btn-primary" id="btn-apply-preset">🚀 นำสัดส่วนนี้ไปใช้กับทุกข้อคะแนนประเมิน</button>
+          </div>
+        </div>
+
+        <!-- Section: Conditional Rules (กฎเงื่อนไขความสัมพันธ์ระหว่างคำตอบ) -->
+        <div class="glass-card" style="border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(17, 24, 39, 0.85); margin-bottom: 1.5rem;">
+          <div class="card-title" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.3rem;">🔗</span>
+              <span>กฎเงื่อนไขความสัมพันธ์ระหว่างคำตอบ (Conditional Rules)</span>
+            </div>
+            <button class="btn btn-secondary" id="btn-add-cond-rule" style="font-size: 0.8rem; padding: 5px 12px; border-color: rgba(168, 85, 247, 0.5);">+ เพิ่มกฎเงื่อนไข</button>
+          </div>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+            กำหนดความสัมพันธ์ระหว่างคำตอบ เช่น หากผู้ตอบเลือก <strong>ช่วงอายุ</strong> ในกลุ่ม <em>ต่ำกว่า 15 ปี, 15–18 ปี, 19–22 ปี</em> ระบบจะล็อกเลือก <strong>อาชีพ</strong> เป็น <em>นักเรียน/นักศึกษา</em> เสมอ:
+          </p>
+
+          <div id="conditional-rules-container">
+            <!-- Dynamic conditional rule cards rendered here -->
+          </div>
+        </div>
+
+        <div id="rules-container">
+          <!-- Dynamic Rule Cards will be injected here -->
+        </div>
+      </section>
+
+      <!-- Tab 4: Data & Preview -->
+      <section id="tab-data" class="tab-pane" style="display: none;">
+        <div class="page-header">
+          <div>
+            <h2>ข้อมูลคำตอบและตารางพรีวิว</h2>
+            <p>สร้างชุดข้อมูลสุ่มตามเงื่อนไข หรือตรวจสอบข้อมูลก่อนส่ง</p>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title">🎲 สุ่มสร้างชุดข้อมูลใหม่</div>
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <div class="form-group" style="margin-bottom: 0; flex: 1;">
+              <label class="form-label">จำนวนชุดข้อมูลที่ต้องการสร้าง</label>
+              <input type="number" class="input-text" id="gen-count" value="300" min="1" max="5000">
+            </div>
+            <button class="btn btn-primary" id="btn-generate-dataset">✨ สุ่มสร้างข้อมูล</button>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="card-title" style="justify-content: space-between;">
+            <span>📑 พรีวิวตารางข้อมูลคำตอบ (แสดง 30 แถวแรก)</span>
+            <span id="data-total-count" style="font-size: 0.85rem; color: var(--accent-cyan);">0 แถว</span>
+          </div>
+          <div class="table-responsive">
+            <table class="preview-table">
+              <thead id="preview-thead"></thead>
+              <tbody id="preview-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Timestamp Faker Tool -->
+  <div class="modal-overlay" id="timestamp-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="font-size: 1.25rem;">⏰ เครื่องมือสุ่มวันเวลาใน Google Sheet</h3>
+        <button class="close-btn" id="btn-close-modal">&times;</button>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5;">
+        เนื่องจาก Google Form เซิร์ฟเวอร์จะประทับเวลา ณ วินาทีที่ได้รับข้อมูลเสมอ หากต้องการให้วันเวลากระจายตัวย้อนหลังอย่างสมจริง ให้ใช้สคริปต์นี้ใน Google Sheet:
+      </p>
+      
+      <ol style="color: var(--text-secondary); font-size: 0.85rem; margin-left: 1.25rem; margin-bottom: 1rem; line-height: 1.6;">
+        <li>เปิด <strong>Google Sheet</strong> คำตอบของฟอร์ม</li>
+        <li>ไปที่เมนู <strong>ส่วนขยาย (Extensions)</strong> &rarr; <strong>Apps Script</strong></li>
+        <li>วางโค้ดด้านล่างแล้วกดปุ่ม <strong>บันทึก (Save)</strong> และกด <strong>เรียกใช้ (Run)</strong></li>
+      </ol>
+
+      <div class="code-box" id="script-code">function randomizeTimestamps() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return;
+
+  var startDate = new Date(2026, 8, 1);   // 1 ก.ย.
+  var endDate   = new Date(2026, 8, 12);  // 12 ก.ย.
+
+  var dates = [];
+  for (var i = 2; i <= lastRow; i++) {
+    var randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+    var d = new Date(randomTime);
+    d.setHours(8 + Math.floor(Math.random() * 14));
+    d.setMinutes(Math.floor(Math.random() * 60));
+    d.setSeconds(Math.floor(Math.random() * 60));
+    dates.push(d);
+  }
+
+  dates.sort(function(a, b) { return a - b; });
+
+  var output = dates.map(function(d) { return [d]; });
+  sheet.getRange(2, 1, output.length, 1).setValues(output);
+  SpreadsheetApp.getUi().alert("✔ สุ่มกระจายวันเวลาเรียบร้อยแล้วทั้งหมด " + output.length + " แถว!");
+}</div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" id="btn-close-modal-2">ปิด</button>
+        <button class="btn btn-primary" id="btn-copy-script">📋 คัดลอกโค้ดสคริปต์</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

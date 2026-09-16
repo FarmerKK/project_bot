@@ -1,0 +1,245 @@
+fields:
+  entry.1493907278:
+    default_value: ชาย
+    options:
+    - ชาย
+    - หญิง
+    - อื่นๆ
+    - ไม่ประสงค์ระบุ
+    required: true
+    title: เพศ
+    type: Multiple Choice
+    weights:
+    - 10
+    - 10
+    - 25
+    - 25
+  entry.1535279630:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 1. การนำเสนอเนื้อหามีความเป็นลำดับชัดเจนและเข้าใจง่าย
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1540462764:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 2. เนื้อหามีความถูกต้องและครบถ้วน
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1545877746:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 9. การจัดวางหน้าต่างระบบเกมและการควบคุมตัวละครมีความสะดวกและลื่นไหล
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1648421804:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 6. รูปแบบของตัวอักษรและขนาดของตัวอักษรมีความเหมาะสม
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1694043965:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 4. เนื้อหาเป็นประโยชน์ต่อผู้เล่น
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1719700807:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 3. เนื้อหามีความน่าเชื่อถือ และทันสมัย
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.1764715424:
+    default_value: ต่ำกว่า 15 ปี
+    options:
+    - ต่ำกว่า 15 ปี
+    - 15–18 ปี
+    - 19–22 ปี
+    - 23–30 ปี
+    - 31–40 ปี
+    - 41–50 ปี
+    - 51 ปีขึ้นไป
+    - ไม่ประสงค์ระบุ
+    required: true
+    title: ช่วงอายุ
+    type: Multiple Choice
+    weights:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 15
+    - 35
+    - 50
+    - 0
+  entry.1837445685:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 8. กราฟิกตัวละครและสิ่งของต่างๆ
+      ที่ใช้ในเกมมีความสวยงามและเหมาะสม
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.184503962:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 10. ภาษาที่ใช้สื่อความหมายเข้าใจได้ง่ายและเหมาะสม
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.706312698:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 5. การใช้โทนสีของภาพและตัวอักษรมีความเหมาะสมกับเนื้อหาที่นำเสนอ
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+  entry.914546434:
+    default_value: นักเรียน/นักศึกษา
+    options:
+    - นักเรียน/นักศึกษา
+    - ข้าราชการ/พนักงานรัฐวิสาหกิจ
+    - พนักงานบริษัทเอกชน
+    - ธุรกิจส่วนตัว/ค้าขาย
+    - อาชีพอิสระ/รับจ้างทั่วไป
+    - เกษตรกร
+    - ไม่ได้ประกอบอาชีพ
+    - ไม่ประสงค์ระบุ
+    required: true
+    title: อาชีพ
+    type: Multiple Choice
+    weights:
+    - 10
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+  entry.915847345:
+    default_value: 5 มากที่สุด
+    options:
+    - 5 มากที่สุด
+    - 4 มาก
+    - 3 ปานกลาง
+    - 2 น้อย
+    - 1 น้อยที่สุด
+    required: true
+    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 7. ภาพมีความน่าสนใจ สวยงาม และเหมาะสม
+    type: Grid
+    weights:
+    - 50
+    - 35
+    - 15
+    - 0
+    - 0
+form:
+  delay_between_requests: 1
+  headless: true
+  mode: direct
+  page_history: 0,1
+  random_delay_range:
+  - 0.5
+  - 2
+  response_url: https://docs.google.com/forms/d/e/1FAIpQLSc8-Z3RRj6dDivOmhlKWJuS77md9-wAZ4AIeZMyrlLJfzPxYQ/formResponse
+  title: แบบประเมินความพึงพอใจของผู้ใช้ที่มีต่อเกมคอมพิวเตอร์แนวสวมบทบาท เรื่อง Re:Green
+  view_url: https://docs.google.com/forms/d/e/1FAIpQLSc8-Z3RRj6dDivOmhlKWJuS77md9-wAZ4AIeZMyrlLJfzPxYQ/viewform?usp=dialog
+conditional_rules: []
