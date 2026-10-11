@@ -178,8 +178,17 @@ class DataLoader:
                 mi = f"{random.randint(0, 59):02d}"
                 response[entry_id] = f"{h}:{mi}"
             else:
-                dummy_words = ["ดีเยี่ยม", "เรียบร้อย", "เห็นด้วย", "ทดสอบระบบ", "ข้อมูลถูกต้อง"]
-                response[entry_id] = random.choice(dummy_words)
+                # Text / Paragraph / Short answer inputs
+                is_req = q.get("required", False) if is_dict else getattr(q, "required", False)
+                default_val = q.get("default_value", "") if is_dict else getattr(q, "default_value", "")
+
+                # Check if field title is suggestions/feedback or optional
+                is_feedback = any(w in str(title) for w in ["ข้อเสนอแนะ", "ขอเสนอแนะ", "ความคิดเห็น", "คำแนะนำ", "ข้อคิดเห็น"])
+
+                if not is_req or is_feedback:
+                    response[entry_id] = ""
+                else:
+                    response[entry_id] = default_val if default_val else "-"
 
         # Apply conditional rules if provided
         if conditional_rules:
