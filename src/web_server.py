@@ -10,7 +10,7 @@ import json
 import logging
 from typing import Dict, Any, List, Optional
 import yaml
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 
 # Ensure project root is in sys.path
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -44,11 +44,20 @@ class VercelPrefixMiddleware(object):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        path_info = environ.get('PATH_INFO', '')
-        for prefix in ['/api/index.py', '/api/index', '/api/app.py', '/api/app']:
-            if path_info.startswith(prefix):
-                environ['PATH_INFO'] = path_info[len(prefix):] or '/'
-                break
+        matched_path = environ.get('HTTP_X_MATCHED_PATH')
+        if matched_path:
+            if matched_path in ['/api/index', '/api/index.py']:
+                environ['PATH_INFO'] = '/'
+            elif matched_path.startswith('/api/index/'):
+                environ['PATH_INFO'] = matched_path[len('/api/index'):] or '/'
+            else:
+                environ['PATH_INFO'] = matched_path
+        else:
+            path_info = environ.get('PATH_INFO', '')
+            for prefix in ['/api/index.py', '/api/index', '/api/app.py', '/api/app']:
+                if path_info.startswith(prefix):
+                    environ['PATH_INFO'] = path_info[len(prefix):] or '/'
+                    break
         return self.wsgi_app(environ, start_response)
 
 app.wsgi_app = VercelPrefixMiddleware(app.wsgi_app)
@@ -164,6 +173,18 @@ def save_config(data: Dict[str, Any]):
 @app.route("/api/index.py")
 def index():
     return render_template("index.html")
+
+
+@app.route("/static/<path:filename>")
+def serve_static(filename):
+    for folder in [
+        os.path.join(BASE_DIR, "public", "static"),
+        os.path.join(BASE_DIR, "static"),
+    ]:
+        target = os.path.join(folder, filename)
+        if os.path.isfile(target):
+            return send_from_directory(folder, filename)
+    return "Not Found", 404
 
 
 @app.route("/api/config", methods=["GET"])
