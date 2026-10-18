@@ -33,8 +33,25 @@ if hasattr(sys.stderr, "reconfigure"):
 app = Flask(
     __name__,
     template_folder=os.path.join(BASE_DIR, "templates"),
-    static_folder=os.path.join(BASE_DIR, "static")
+    static_folder=os.path.join(BASE_DIR, "static"),
+    static_url_path="/static"
 )
+app.url_map.strict_slashes = False
+
+# Normalize Vercel Serverless rewrites prefix in WSGI environ
+class VercelPrefixMiddleware(object):
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        path_info = environ.get('PATH_INFO', '')
+        for prefix in ['/api/index.py', '/api/index', '/api/app.py', '/api/app']:
+            if path_info.startswith(prefix):
+                environ['PATH_INFO'] = path_info[len(prefix):] or '/'
+                break
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPrefixMiddleware(app.wsgi_app)
 
 # Global Bot State Controller
 class BotState:
@@ -143,6 +160,8 @@ def save_config(data: Dict[str, Any]):
 
 # Routes
 @app.route("/")
+@app.route("/api/index")
+@app.route("/api/index.py")
 def index():
     return render_template("index.html")
 
