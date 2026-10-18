@@ -1,8 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/((?!static/).*)",
-      "destination": "/api/index"
+      "source": "/api/:match*",
+      "destination": "/api/index?__route=/api/:match*"
+    },
+    {
+      "source": "/((?!static|css|js|favicon).*)",
+      "destination": "/api/index?__route=/$1"
     }
   ]
 }

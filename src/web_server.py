@@ -9,6 +9,7 @@ import time
 import json
 import logging
 from typing import Dict, Any, List, Optional
+from urllib.parse import parse_qs, urlencode
 import yaml
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
@@ -38,34 +39,29 @@ app = Flask(
 )
 app.url_map.strict_slashes = False
 
-# Normalize Vercel Serverless rewrites prefix in WSGI environ
+# Normalize Vercel Serverless rewrites prefix and route parameter in WSGI environ
 class VercelPrefixMiddleware(object):
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
-        environ['ORIGINAL_ENV_DEBUG'] = {
-            'PATH_INFO': environ.get('PATH_INFO'),
-            'RAW_URI': environ.get('RAW_URI'),
-            'REQUEST_URI': environ.get('REQUEST_URI'),
-            'HTTP_X_MATCHED_PATH': environ.get('HTTP_X_MATCHED_PATH'),
-            'HTTP_X_FORWARDED_PATH': environ.get('HTTP_X_FORWARDED_PATH'),
-            'HTTP_X_VERCEL_FORWARDED_PATH': environ.get('HTTP_X_VERCEL_FORWARDED_PATH'),
-            'HTTP_X_NOW_ROUTE_MATCHES': environ.get('HTTP_X_NOW_ROUTE_MATCHES'),
-        }
-        matched_path = environ.get('HTTP_X_MATCHED_PATH')
-        if matched_path:
-            if matched_path in ['/api/index', '/api/index.py']:
-                environ['PATH_INFO'] = '/'
-            elif matched_path.startswith('/api/index/'):
-                environ['PATH_INFO'] = matched_path[len('/api/index'):] or '/'
-            else:
-                environ['PATH_INFO'] = matched_path
+        query_str = environ.get('QUERY_STRING', '')
+        if '__route' in query_str:
+            params = parse_qs(query_str, keep_blank_values=True)
+            if '__route' in params and params['__route']:
+                route = params.pop('__route')[0]
+                if not route.startswith('/'):
+                    route = '/' + route
+                environ['PATH_INFO'] = route
+                environ['QUERY_STRING'] = urlencode(params, doseq=True)
         else:
             path_info = environ.get('PATH_INFO', '')
             for prefix in ['/api/index.py', '/api/index', '/api/app.py', '/api/app']:
-                if path_info.startswith(prefix):
-                    environ['PATH_INFO'] = path_info[len(prefix):] or '/'
+                if path_info == prefix:
+                    environ['PATH_INFO'] = '/'
+                    break
+                elif path_info.startswith(prefix + '/'):
+                    environ['PATH_INFO'] = path_info[len(prefix):]
                     break
         return self.wsgi_app(environ, start_response)
 
@@ -181,11 +177,6 @@ def save_config(data: Dict[str, Any]):
 @app.route("/api/index")
 @app.route("/api/index.py")
 def index():
-    if request.args.get("debug") == "1":
-        return jsonify({
-            "debug": request.environ.get("ORIGINAL_ENV_DEBUG"),
-            "environ": {k: str(v) for k, v in request.environ.items() if not k.startswith("wsgi.") and k != "ORIGINAL_ENV_DEBUG"}
-        })
     return render_template("index.html")
 
 
