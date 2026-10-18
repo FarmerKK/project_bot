@@ -2,8 +2,12 @@
 
 let currentConfig = null;
 let isPolling = false;
+let isVercelEnv = false;
+let clientRunnerActive = false;
+let clientRunnerStopRequested = false;
 
 document.addEventListener("DOMContentLoaded", () => {
+  checkEnv();
   initTabs();
   initControls();
   initScanner();
@@ -54,6 +58,102 @@ function initControls() {
   const modeSelect = document.getElementById("control-mode");
 
   btnStart.addEventListener("click", async () => {
+    if (isVercelEnv) {
+      btnStart.disabled = true;
+      btnStop.disabled = false;
+      clientRunnerActive = true;
+      clientRunnerStopRequested = false;
+
+      const terminal = document.getElementById("terminal-logs");
+      const appendLog = (text, type = "info") => {
+        const timeStr = new Date().toLocaleTimeString();
+        let cls = "log-info";
+        if (type === "success") cls = "log-success";
+        if (type === "error") cls = "log-error";
+        if (type === "warning") cls = "log-warning";
+        terminal.innerHTML += `<div class="log-entry ${cls}"><span class="log-time">[${timeStr}]</span> ${escapeHtml(text)}</div>`;
+        terminal.scrollTop = terminal.scrollHeight;
+      };
+
+      appendLog("☁ รันบน Vercel Cloud: ดำเนินการส่งแบบ Client Stream", "info");
+
+      try {
+        const dsRes = await fetch("/api/dataset-all");
+        const dsData = await dsRes.json();
+        if (dsData.status !== "success" || !dsData.dataset || dsData.dataset.length === 0) {
+          alert("ไม่พบข้อมูลคำตอบ กรุณาสุ่มสร้างข้อมูลในแท็บ 'ข้อมูลคำตอบ' ก่อน");
+          btnStart.disabled = false;
+          btnStop.disabled = true;
+          clientRunnerActive = false;
+          return;
+        }
+
+        const dataset = dsData.dataset;
+        const total = dataset.length;
+        let successCount = 0;
+        let failCount = 0;
+        const delayMs = Math.round(parseFloat(delaySlider.value) * 1000);
+
+        document.getElementById("stat-total").innerText = total;
+        document.getElementById("stat-success").innerText = "0";
+        document.getElementById("stat-failed").innerText = "0";
+        appendLog(`🚀 เริ่มต้นส่งข้อมูลทั้งหมด ${total} ชุด (ดีเลย์ ${delaySlider.value}s)`, "info");
+
+        for (let i = 0; i < total; i++) {
+          if (clientRunnerStopRequested) {
+            appendLog("🛑 ได้รับคำสั่งหยุดการทำงาน", "warning");
+            break;
+          }
+
+          const currentIdx = i + 1;
+          const pct = Math.round((currentIdx / total) * 100);
+
+          document.getElementById("progress-bar").style.width = `${pct}%`;
+          document.getElementById("progress-text").innerText = `${currentIdx} / ${total}`;
+          document.getElementById("stat-percent").innerText = `${pct}%`;
+          document.getElementById("bot-status-text").innerText = `กำลังส่งข้อมูล (${pct}%)`;
+
+          try {
+            const subRes = await fetch("/api/submit-single", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ row: dataset[i], index: currentIdx })
+            });
+            const subData = await subRes.json();
+
+            if (subData.success) {
+              successCount++;
+              document.getElementById("stat-success").innerText = successCount;
+              appendLog(`[${currentIdx}/${total}] ✔ ส่งสำเร็จ (HTTP ${subData.status_code}, ${Math.round(subData.response_time * 1000)}ms)`, "success");
+            } else {
+              failCount++;
+              document.getElementById("stat-failed").innerText = failCount;
+              appendLog(`[${currentIdx}/${total}] ✖ ล้มเหลว (${subData.error_msg || 'เกิดข้อผิดพลาด'})`, "error");
+            }
+          } catch (err) {
+            failCount++;
+            document.getElementById("stat-failed").innerText = failCount;
+            appendLog(`[${currentIdx}/${total}] ✖ เชื่อมต่อล้มเหลว (${err.message})`, "error");
+          }
+
+          if (i < total - 1 && !clientRunnerStopRequested && delayMs > 0) {
+            await new Promise(r => setTimeout(r, delayMs));
+          }
+        }
+
+        appendLog(`🏁 เสร็จสิ้นการทำงาน! สำเร็จ: ${successCount}/${total}, ล้มเหลว: ${failCount}`, "info");
+      } catch (err) {
+        appendLog(`✖ เกิดข้อผิดพลาดร้ายแรง: ${err.message}`, "error");
+      } finally {
+        btnStart.disabled = false;
+        btnStop.disabled = true;
+        clientRunnerActive = false;
+        document.getElementById("bot-status-text").innerText = "พร้อมทำงาน";
+        document.getElementById("bot-status-text").style.color = "var(--text-secondary)";
+      }
+      return;
+    }
+
     btnStart.disabled = true;
     try {
       const res = await fetch("/api/start", {
@@ -76,6 +176,11 @@ function initControls() {
   });
 
   btnStop.addEventListener("click", async () => {
+    if (clientRunnerActive) {
+      clientRunnerStopRequested = true;
+      btnStop.disabled = true;
+      return;
+    }
     try {
       await fetch("/api/stop", { method: "POST" });
     } catch (err) {
@@ -94,6 +199,7 @@ function initControls() {
 
 // Poll Status
 async function loadStatus() {
+  if (clientRunnerActive) return;
   try {
     const res = await fetch("/api/status");
     const status = await res.json();
@@ -815,4 +921,39 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Environment Check for Cloud / Vercel
+async function checkEnv() {
+  try {
+    const res = await fetch("/api/env");
+    const data = await res.json();
+    isVercelEnv = Boolean(data.is_vercel);
+    if (isVercelEnv) {
+      const modeSelect = document.getElementById("control-mode");
+      if (modeSelect) {
+        const browserOpt = modeSelect.querySelector('option[value="browser"]');
+        if (browserOpt) {
+          browserOpt.disabled = true;
+          browserOpt.innerText += " (เฉพาะ Local)";
+        }
+      }
+      const headerTitle = document.querySelector(".header-title");
+      if (headerTitle && !document.getElementById("vercel-badge")) {
+        const cloudBadge = document.createElement("span");
+        cloudBadge.id = "vercel-badge";
+        cloudBadge.className = "badge";
+        cloudBadge.style.background = "rgba(168, 85, 247, 0.2)";
+        cloudBadge.style.color = "#c084fc";
+        cloudBadge.style.fontSize = "0.75rem";
+        cloudBadge.style.padding = "3px 10px";
+        cloudBadge.style.borderRadius = "12px";
+        cloudBadge.style.marginLeft = "12px";
+        cloudBadge.innerText = "☁ Vercel Serverless";
+        headerTitle.appendChild(cloudBadge);
+      }
+    }
+  } catch (e) {
+    console.error("checkEnv error:", e);
+  }
 }

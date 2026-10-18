@@ -19,7 +19,10 @@ sys.path.insert(0, BASE_DIR)
 from src.parser import GoogleFormParser
 from src.data_loader import DataLoader
 from src.direct_submitter import DirectSubmitter
-from src.browser_submitter import BrowserSubmitter
+try:
+    from src.browser_submitter import BrowserSubmitter
+except Exception:
+    BrowserSubmitter = None
 
 # Ensure UTF-8 output
 if hasattr(sys.stdout, "reconfigure"):
@@ -82,11 +85,39 @@ class BotState:
 bot_state = BotState()
 
 
+def is_vercel() -> bool:
+    return bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+
+
 def get_config_path() -> str:
+    if is_vercel():
+        tmp_path = "/tmp/form_config.yaml"
+        if not os.path.exists(tmp_path):
+            bundled = os.path.join(BASE_DIR, "config", "form_config.yaml")
+            if os.path.exists(bundled):
+                try:
+                    import shutil
+                    os.makedirs("/tmp", exist_ok=True)
+                    shutil.copyfile(bundled, tmp_path)
+                except Exception:
+                    pass
+        return tmp_path
     return os.path.join(BASE_DIR, "config", "form_config.yaml")
 
 
 def get_data_path() -> str:
+    if is_vercel():
+        tmp_path = "/tmp/responses.csv"
+        if not os.path.exists(tmp_path):
+            bundled = os.path.join(BASE_DIR, "data", "responses.csv")
+            if os.path.exists(bundled):
+                try:
+                    import shutil
+                    os.makedirs("/tmp", exist_ok=True)
+                    shutil.copyfile(bundled, tmp_path)
+                except Exception:
+                    pass
+        return tmp_path
     return os.path.join(BASE_DIR, "data", "responses.csv")
 
 
@@ -100,9 +131,14 @@ def load_config() -> Dict[str, Any]:
 
 def save_config(data: Dict[str, Any]):
     cfg_p = get_config_path()
-    os.makedirs(os.path.dirname(cfg_p), exist_ok=True)
-    with open(cfg_p, "w", encoding="utf-8") as f:
-        yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    try:
+        os.makedirs(os.path.dirname(cfg_p), exist_ok=True)
+        with open(cfg_p, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
+    except OSError:
+        fallback_p = "/tmp/form_config.yaml"
+        with open(fallback_p, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, allow_unicode=True, default_flow_style=False, sort_keys=False)
 
 
 # Routes
@@ -254,6 +290,9 @@ def api_start():
     mode = req_data.get("mode", "direct")
     delay = float(req_data.get("delay", 0.5))
 
+    if mode == "browser" and BrowserSubmitter is None:
+        return jsonify({"status": "error", "message": "โหมด Browser ไม่รองรับบนระบบ Cloud / Vercel กรุณาเลือกโหมด Direct (HTTP)"}), 400
+
     cfg = load_config()
     form_info = cfg.get("form", {})
     fields = cfg.get("fields", {})
@@ -292,6 +331,62 @@ def api_stop():
 @app.route("/api/status", methods=["GET"])
 def api_status():
     return jsonify(bot_state.to_dict())
+
+
+@app.route("/api/env", methods=["GET"])
+def api_get_env():
+    return jsonify({
+        "is_vercel": is_vercel(),
+        "has_browser": BrowserSubmitter is not None
+    })
+
+
+@app.route("/api/dataset-all", methods=["GET"])
+def api_get_all_dataset():
+    data_p = get_data_path()
+    if not os.path.exists(data_p):
+        return jsonify({"status": "error", "message": "ไม่พบไฟล์ข้อมูลคำตอบ กรุณาสุ่มสร้างข้อมูลก่อน", "dataset": []}), 400
+
+    cfg = load_config()
+    fields = cfg.get("fields", {})
+    field_mapping = {val.get("title", ""): entry_id for entry_id, val in fields.items() if val.get("title")}
+    options_mapping = {entry_id: f_data.get("options", []) for entry_id, f_data in fields.items() if f_data.get("options")}
+
+    dataset = DataLoader.load_data(data_p, field_mapping=field_mapping, options_mapping=options_mapping)
+    return jsonify({
+        "status": "success",
+        "total": len(dataset),
+        "dataset": dataset
+    })
+
+
+@app.route("/api/submit-single", methods=["POST"])
+def api_submit_single():
+    req_data = request.get_json() or {}
+    row = req_data.get("row")
+    index = int(req_data.get("index", 1))
+
+    if not row:
+        return jsonify({"status": "error", "message": "Missing row data"}), 400
+
+    cfg = load_config()
+    form_info = cfg.get("form", {})
+    page_history = form_info.get("page_history", "0,1")
+
+    submitter = DirectSubmitter(
+        response_url=form_info.get("response_url"),
+        view_url=form_info.get("view_url"),
+        page_history=page_history
+    )
+
+    res = submitter.submit_single(row, index=index)
+    return jsonify({
+        "status": "success" if res.success else "fail",
+        "success": res.success,
+        "status_code": res.status_code,
+        "response_time": round(res.response_time, 3),
+        "error_msg": res.error_msg
+    })
 
 
 if __name__ == "__main__":
