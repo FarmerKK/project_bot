@@ -1,249 +1,168 @@
-conditional_rules:
-- if_field: ช่วงอายุ
-  if_in:
-  - ต่ำกว่า 15 ปี
-  - 15–18 ปี
-  - 19–22 ปี
-  then_field: อาชีพ
-  then_set: นักเรียน/นักศึกษา
-  enabled: true
-  description: 'ช่วงอายุ [ต่ำกว่า 15 ปี, 15–18 ปี, 19–22 ปี] ➔ ล็อก อาชีพ: นักเรียน/นักศึกษา'
-fields:
-  entry.1493907278:
-    default_value: ชาย
-    options:
-    - ชาย
-    - หญิง
-    required: true
-    title: เพศ
-    type: Multiple Choice
-    weights:
-    - 75
-    - 18
-  entry.1535279630:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 1. การนำเสนอเนื้อหามีความเป็นลำดับชัดเจนและเข้าใจง่าย
-    type: Grid
-    weights:
-    - 41
-    - 27
-    - 12
-    - 10
-    - 10
-  entry.1540462764:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 2. เนื้อหามีความถูกต้องและครบถ้วน
-    type: Grid
-    weights:
-    - 41
-    - 14
-    - 12
-    - 10
-    - 10
-  entry.1545877746:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 9. การจัดวางหน้าต่างระบบเกมและการควบคุมตัวละครมีความสะดวกและลื่นไหล
-    type: Grid
-    weights:
-    - 41
-    - 14
-    - 12
-    - 10
-    - 10
-  entry.1648421804:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 6. รูปแบบของตัวอักษรและขนาดของตัวอักษรมีความเหมาะสม
-    type: Grid
-    weights:
-    - 41
-    - 15
-    - 12
-    - 10
-    - 10
-  entry.1694043965:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 4. เนื้อหาเป็นประโยชน์ต่อผู้เล่น
-    type: Grid
-    weights:
-    - 41
-    - 18
-    - 12
-    - 10
-    - 10
-  entry.1719700807:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 3. เนื้อหามีความน่าเชื่อถือ และทันสมัย
-    type: Grid
-    weights:
-    - 41
-    - 18
-    - 12
-    - 10
-    - 10
-  entry.176106876:
-    default_value: ''
-    options: []
-    required: false
-    title: ขอเสนอแนะ
-    type: Paragraph
-    weights: []
-  entry.1764715424:
-    default_value: ต่ำกว่า 15 ปี
-    options:
-    - ต่ำกว่า 15 ปี
-    - 15–18 ปี
-    - 19–22 ปี
-    - 23–30 ปี
-    - 31–39 ปี
-    - 40 ปีขึ้นไป
-    required: true
-    title: ช่วงอายุ
-    type: Multiple Choice
-    weights:
-    - 0
-    - 0
-    - 0
-    - 10
-    - 12
-    - 27
-  entry.1837445685:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 8. กราฟิกตัวละครและสิ่งของต่างๆ
-      ที่ใช้ในเกมมีความสวยงามและเหมาะสม
-    type: Grid
-    weights:
-    - 41
-    - 15
-    - 12
-    - 10
-    - 10
-  entry.184503962:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 10. ภาษาที่ใช้สื่อความหมายเข้าใจได้ง่ายและเหมาะสม
-    type: Grid
-    weights:
-    - 41
-    - 17
-    - 12
-    - 10
-    - 10
-  entry.706312698:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 5. การใช้โทนสีของภาพและตัวอักษรมีความเหมาะสมกับเนื้อหาที่นำเสนอ
-    type: Grid
-    weights:
-    - 41
-    - 15
-    - 12
-    - 10
-    - 10
-  entry.914546434:
-    default_value: นักเรียน/นักศึกษา
-    options:
-    - นักเรียน/นักศึกษา
-    - ข้าราชการ/พนักงานรัฐวิสาหกิจ
-    - พนักงานบริษัทเอกชน
-    - ธุรกิจส่วนตัว/ค้าขาย
-    - อาชีพอิสระ/รับจ้างทั่วไป
-    - ไม่ได้ประกอบอาชีพ
-    required: true
-    title: อาชีพ
-    type: Multiple Choice
-    weights:
-    - 0
-    - 17
-    - 17
-    - 17
-    - 17
-    - 17
-  entry.915847345:
-    default_value: 5 มากที่สุด
-    options:
-    - 5 มากที่สุด
-    - 4 มาก
-    - 3 ปานกลาง
-    - 2 น้อย
-    - 1 น้อยที่สุด
-    required: true
-    title: ระดับความพึงพอใจที่มีต่อเกม Re:Green - 7. ภาพมีความน่าสนใจ สวยงาม และเหมาะสม
-    type: Grid
-    weights:
-    - 41
-    - 27
-    - 12
-    - 10
-    - 10
 form:
-  delay_between_requests: 1
-  headless: true
+  title: แบบประเมินความพึงพอใจต่อการใช้งานแอปพลิเคชันค้นหาตำแหน่งถังขยะในมหาวิทยาลัยราชภัฏหมู่บ้านจอมบึง🗑️😊
+  view_url: https://docs.google.com/forms/d/e/1FAIpQLSdG3Q2pNrNYy5eTqKHVfZqe4Zk-ZsfxzIz5Uze3h5scLRnMsw/viewform?usp=send_form
+  response_url: https://docs.google.com/forms/d/e/1FAIpQLSdG3Q2pNrNYy5eTqKHVfZqe4Zk-ZsfxzIz5Uze3h5scLRnMsw/formResponse
   mode: direct
-  page_history: 0,1
+  headless: true
+  delay_between_requests: 1.0
   random_delay_range:
   - 0.5
-  - 2
-  response_url: https://docs.google.com/forms/d/e/1FAIpQLSeDfZ5ye4Y2VeErTgzJxooYOQxMebID00hVqNELtCfrUAvHzw/formResponse
-  title: แบบประเมินความพึงพอใจของผู้ใช้ที่มีต่อเกมคอมพิวเตอร์แนวสวมบทบาท เรื่อง Re:Green
-  view_url: https://docs.google.com/forms/d/e/1FAIpQLSeDfZ5ye4Y2VeErTgzJxooYOQxMebID00hVqNELtCfrUAvHzw/viewform?usp=dialog
+  - 2.0
+  page_history: 0,1,2,3,4,5
+fields:
+  entry.336506317:
+    title: '  สถานภาพของท่านในมหาวิทยาลัยฯ (Your Status at the University)  '
+    type: Multiple Choice
+    required: false
+    default_value: นักศึกษา (Student)
+    options:
+    - นักศึกษา (Student)
+    - บุคลากร/อาจารย์ (Staff/Faculty)
+    - บุคคลภายนอก (Visitor)
+  entry.275698798:
+    title: ความถี่ในการใช้งานแอปพลิเคชันนี้ (Frequency of using this application)
+    type: Multiple Choice
+    required: false
+    default_value: เพิ่งลองใช้เป็นครั้งแรก (First time using)
+    options:
+    - เพิ่งลองใช้เป็นครั้งแรก (First time using)
+    - น้อยกว่าสัปดาห์ละ 1 ครั้ง
+    - สัปดาห์ละ 1–3 ครั้ง
+    - สัปดาห์ละ 4 ครั้งขึ้นไป
+  entry.476365749:
+    title: '   ความพยายามในการทิ้งขยะในถังขยะที่แยกประเภทเมื่ออยู่ในมหาวิทยาลัยฯ  '
+    type: Multiple Choice
+    required: false
+    default_value: พยายามทิ้งในถังแยกประเภทเสมอ
+    options:
+    - พยายามทิ้งในถังแยกประเภทเสมอ
+    - พยายามทิ้งในถังแยกประเภทส่วนใหญ่
+    - ทิ้งในถังไหนก็ได้ที่สะดวก
+    - ไม่เคยใส่ใจเรื่องการแยกขยะ
+  entry.164488504:
+    title: 1.1 ความถูกต้องของตำแหน่งถังขยะที่แสดงบนแผนที่
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.1488214269:
+    title: '1.2 ความชัดเจนของแผนที่และการระบุจุด (Pin)  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.142841922:
+    title: '  1.3 ความง่ายในการค้นหาถังขยะที่อยู่ใกล้ท่านในปัจจุบัน  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.1335334883:
+    title: '  2.1 ความชัดเจนของการระบุประเภทถังขยะ (เช่น ขยะรีไซเคิล, ขยะทั่วไป)  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.1016750529:
+    title: '  2.2 ข้อมูลแนะนำว่าควรทิ้งขยะแต่ละชนิดในถังใด (ถ้ามี) มีประโยชน์  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.242344859:
+    title: '  3.1 ความง่ายในการเข้าถึงและใช้งานแอปพลิเคชัน (Usability)  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.591610265:
+    title: '  3.2 ความรวดเร็วในการโหลดข้อมูลและการทำงานของแอป  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.31704085:
+    title: '  3.3 การออกแบบหน้าตาแอปพลิเคชันที่น่าใช้และเป็นมิตร  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.753476351:
+    title: '  4.1 แอปพลิเคชันช่วยให้ท่านหาถังขยะได้เร็วขึ้น  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.2138190406:
+    title: '  4.2 แอปพลิเคชันช่วยส่งเสริมให้ท่านแยกขยะอย่างถูกต้องมากขึ้น  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.1555876904:
+    title: '  4.3 ความพึงพอใจโดยรวมต่อการใช้งานแอปพลิเคชันนี้  '
+    type: Unknown (18)
+    required: false
+    default_value: '1'
+    options:
+    - '1'
+    - '2'
+    - '3'
+    - '4'
+    - '5'
+  entry.697927119:
+    title: ข้อคิดเห็นและข้อเสนอแนะเพิ่มเติม
+    type: Short Answer
+    required: false
+    default_value: ''
+    options: []

@@ -44,6 +44,15 @@ class VercelPrefixMiddleware(object):
         self.wsgi_app = wsgi_app
 
     def __call__(self, environ, start_response):
+        environ['ORIGINAL_ENV_DEBUG'] = {
+            'PATH_INFO': environ.get('PATH_INFO'),
+            'RAW_URI': environ.get('RAW_URI'),
+            'REQUEST_URI': environ.get('REQUEST_URI'),
+            'HTTP_X_MATCHED_PATH': environ.get('HTTP_X_MATCHED_PATH'),
+            'HTTP_X_FORWARDED_PATH': environ.get('HTTP_X_FORWARDED_PATH'),
+            'HTTP_X_VERCEL_FORWARDED_PATH': environ.get('HTTP_X_VERCEL_FORWARDED_PATH'),
+            'HTTP_X_NOW_ROUTE_MATCHES': environ.get('HTTP_X_NOW_ROUTE_MATCHES'),
+        }
         matched_path = environ.get('HTTP_X_MATCHED_PATH')
         if matched_path:
             if matched_path in ['/api/index', '/api/index.py']:
@@ -172,6 +181,11 @@ def save_config(data: Dict[str, Any]):
 @app.route("/api/index")
 @app.route("/api/index.py")
 def index():
+    if request.args.get("debug") == "1":
+        return jsonify({
+            "debug": request.environ.get("ORIGINAL_ENV_DEBUG"),
+            "environ": {k: str(v) for k, v in request.environ.items() if not k.startswith("wsgi.") and k != "ORIGINAL_ENV_DEBUG"}
+        })
     return render_template("index.html")
 
 
